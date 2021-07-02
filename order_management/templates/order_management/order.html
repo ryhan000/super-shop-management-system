@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>{% block title %}New Order{% endblock %}</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		{% load staticfiles %}
+		<link rel="stylesheet" type="text/css" href="{% static 'order_management/style.css' %}"/>
+
+	</head>
+	<body>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+		<div id="header">
+			<div id="branding">
+				<h1 id="site-name"><a href="/">Super Shop Administration</a></h1>
+			</div>
+			<div id="user-tools">
+				Welcome, <strong>admin</strong>. <a href="">View site</a> /
+				<a href="{% url 'admin:password_change' %}">Change password</a> /
+				<a href="{% url 'admin:logout' %}">Log out</a>
+			</div>
+
+		</div>
+		
+		{% block content %}
+		<div class="mark_from_heading">
+			<a class="btn" href=""  >Home <i class="fa fa-angle-right" aria-hidden="true"></i> </a>
+			<h5>Orders</h5>
+		</div>
+
+		<div id="app">
+			<div class="header-item">
+				<h1>New Order</h1>
+			</div>
+
+				<p v-if="fieldErrors.includes('')" class="error-message">Please correct the error below.</p>
+
+				<div class="block">
+					<div class="info-header">
+						<h2>Customer Info</h2>
+					</div>
+
+
+					<div class="block-item">
+						<label>Name:</label>
+						<div class="w-100 d-flex flex-dir-column">
+							<input type="text" v-model="customerName"/>
+							<small v-if="fieldErrors.includes('customerName')">Enter Customer name.</small>
+						</div>
+					</div>
+					<div class="block-item">
+						<label>Phone:</label>
+						<div class="w-100 d-flex flex-dir-column">
+							<input type="text" v-model="customerPhone" />
+							<small v-if="fieldErrors.includes('customerPhone')">Enter Customer Phone.</small>
+						</div>
+					</div>
+
+					<div class="block-item">
+						<label>Email:</label>
+						<div class="w-100 d-flex flex-dir-column">
+							<input type="text" v-model="cutomerEmail" />
+							<small v-if="fieldErrors.includes('cutomerEmail')">Enter Customer Email.</small>
+						</div>
+					</div>
+		
+
+				</div>
+				<div class="block">
+					<div class="info-header">
+							<h2>Order Info</h2>
+					</div>
+					<div class="d-flex-block justify-content-space-between bb order-pad overflow">
+						<div class="block-item-input">
+							<label>Product</label>
+							<select v-model='selectedProduct'>
+								<option v-for="product in products" :value="product.id">
+										[[product.name]]
+								</option>
+							</select>
+						</div>
+				
+						<div class="block-item-input">
+							<label>Quantity:</label>
+							<input type="number" v-model="selectedProductQuantity" />
+						</div>
+				
+						<div class="block-item-input">
+							<label>Calculate price:</label>
+							<input type="number" :value="getProductPrice(selectedProductQuantity)" />
+						</div>
+							
+					</div>
+					<div class="add-cart-btn">
+							<button @click="addToCart">Add to Cart</button>
+					</div>
+				</div>
+
+				<div v-if='cart.length' class="block bg-transparent table-container">
+					<div class="info-header">
+						<h2>Cart Info</h2>
+					</div>
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Product</th>
+								<th>Quantity</th>
+								<th>Price</th>
+								<th>Actions</th>
+								</tr>
+						</thead>
+						<tbody>
+							<tr v-for="product in cart">
+								<td>[[product.productName]]</td>
+								<td>[[product.quantity]]</td>
+								<td>[[product.productPrice]]</td>
+								<td @click="removeItem(product.productId)"><button class="delete-btn">Delete</button></td>
+							</tr>
+							<tr>
+								<td></td>
+								<th>Total Price</th>
+								<th>[[getTotalPrice()]]</th>
+								<td></td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="submit-btn">
+						<button @click="submit" :disabled='!cart.length'>Submit</button>
+					</div>
+				</div>
+				
+
+				<form action="" method="POST" hidden ref="formRef">
+					{% csrf_token %}
+					<input name='cart' :value='getCartPayload()' />
+				</form>
+
+		</div>
+
+		<script>
+			var app = new Vue({
+				delimiters: ['[[', ']]'],
+				el: '#app',
+				data: {
+					customerName: '',
+					customerPhone: '',
+					cutomerEmail: '',
+					products: {{products_list|safe}},
+					selectedProduct: '',
+					selectedProductQuantity: 1,
+					cart: [],
+					price: 0,
+					fieldErrors: [],
+				},
+				methods: {
+					addToCart: function() {
+						console.log(this.cart)
+							if (!this.selectedProductQuantity) return;
+							const data = {
+								productId: this.selectedProduct,
+								quantity: parseInt(this.selectedProductQuantity),
+								productPrice: this.getProductPrice(this.selectedProductQuantity),
+								productName: this.getProductName(this.selectedProduct)
+							};
+
+							const existingProductIdx = this.cart.findIndex(p => p.productId === this.selectedProduct);
+
+							if (existingProductIdx > -1) {
+								this.cart[existingProductIdx].quantity += parseInt(this.selectedProductQuantity);
+								this.cart[existingProductIdx].productPrice += this.getProductPrice(this.selectedProductQuantity);
+									return;
+							}
+
+							this.cart.push(data);
+							this.price = 0
+					},
+					removeItem: function(productId) {
+						this.cart = this.cart.filter(p => p.productId !== productId);
+					},
+					getProductName: function(selectedProduct) {
+						const matchedProduct = this.products.find(p => p.id === selectedProduct);
+						return matchedProduct && (matchedProduct.name ) || '';
+					},
+					getTotalPrice: function() {
+						let totalPrice = 0;
+						for (const product of this.cart) {
+							totalPrice += parseInt(product.productPrice);
+						}
+
+						return totalPrice;
+					},
+					getProductPrice: function(quantity) {
+						const matchProduct = this.products.find(p => p.id === this.selectedProduct);
+						return matchProduct && (matchProduct.price * quantity)  || 0;
+					},
+					getAvailableQuantity: function(batchId) {
+						const matchedBatch = this.batches.find(p => p.id === batchId);
+						return matchedBatch && (matchedBatch.available_quantity)  || 0;
+					},
+					getCartPayload: function() {
+						const data = {
+							customerName: this.customerName,
+							customerPhone: this.customerPhone,
+							cutomerEmail: this.cutomerEmail,
+							cart: this.cart,
+						}
+						return JSON.stringify(data);
+					},
+					submit: function() {
+						if (!this.cutomerEmail) this.fieldErrors.push('cutomerEmail');
+						if (!this.customerName) this.fieldErrors.push('customerName');
+						if (!this.customerPhone) this.fieldErrors.push('customerPhone');
+						if (!this.cutomerEmail || !this.customerName || !this.customerPhone) return;
+						
+						this.fieldErrors = [];
+						this.$refs.formRef.submit();
+					}
+				}
+
+			})
+		</script>
+
+	{% endblock %}
+	</body>
+</html>

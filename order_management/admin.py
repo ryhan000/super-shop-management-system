@@ -9,13 +9,11 @@ class CustomerAdmin(admin.ModelAdmin):
 admin.site.register(Customer, CustomerAdmin)
 
 
-
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('customer', 'total_amount')
-
+    
 
 admin.site.register(Order, OrderAdmin)
-
 
 
 class ItemAdmin(admin.ModelAdmin):

@@ -22,4 +22,5 @@ admin.site.index_title = 'Administration'
 
 urlpatterns = [
     path('', admin.site.urls),
+    path('order-management/', include('order_management.urls')),
 ]
