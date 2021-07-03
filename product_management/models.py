@@ -22,11 +22,13 @@ class Product(models.Model):
     code = models.CharField(db_column='code', max_length=50)
     unit_price = models.IntegerField(db_column='unit_price')
     current_stock = models.IntegerField(db_column='current_stock')
+    created_at = models.DateTimeField(db_column='created_at', auto_now_add=True)
 
     def __str__(self):
         return str(self.name)
 
     class Meta:
+        ordering = ['-created_at']
         verbose_name_plural = 'Products'
         db_table = 'Product'
 

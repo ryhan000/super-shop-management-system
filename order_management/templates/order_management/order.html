@@ -64,8 +64,8 @@
 					<div class="block-item">
 						<label>Email:</label>
 						<div class="w-100 d-flex flex-dir-column">
-							<input type="text" v-model="cutomerEmail" />
-							<small v-if="fieldErrors.includes('cutomerEmail')">Enter Customer Email.</small>
+							<input type="text" v-model="customerEmail" />
+							<small v-if="fieldErrors.includes('customerEmail')">Enter Customer Email.</small>
 						</div>
 					</div>
 		
@@ -149,7 +149,7 @@
 				data: {
 					customerName: '',
 					customerPhone: '',
-					cutomerEmail: '',
+					customerEmail: '',
 					products: {{products_list|safe}},
 					selectedProduct: '',
 					selectedProductQuantity: 1,
@@ -206,16 +206,16 @@
 						const data = {
 							customerName: this.customerName,
 							customerPhone: this.customerPhone,
-							cutomerEmail: this.cutomerEmail,
+							customerEmail: this.customerEmail,
 							cart: this.cart,
 						}
 						return JSON.stringify(data);
 					},
 					submit: function() {
-						if (!this.cutomerEmail) this.fieldErrors.push('cutomerEmail');
+						if (!this.customerEmail) this.fieldErrors.push('customerEmail');
 						if (!this.customerName) this.fieldErrors.push('customerName');
 						if (!this.customerPhone) this.fieldErrors.push('customerPhone');
-						if (!this.cutomerEmail || !this.customerName || !this.customerPhone) return;
+						if (!this.customerEmail || !this.customerName || !this.customerPhone) return;
 						
 						this.fieldErrors = [];
 						this.$refs.formRef.submit();
