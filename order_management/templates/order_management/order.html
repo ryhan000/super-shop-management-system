@@ -88,6 +88,7 @@
 						<div class="block-item-input">
 							<label>Quantity:</label>
 							<input type="number" v-model="selectedProductQuantity" />
+							<small v-if="fieldErrors.includes('selectedProductQuantity')">Product quentity is greater than current stock.</small>
 						</div>
 				
 						<div class="block-item-input">
@@ -157,10 +158,33 @@
 					price: 0,
 					fieldErrors: [],
 				},
+				watch: {
+					selectedProductQuantity: function () {
+						if (!this.selectedProduct) return;
+						const that = this
+						current_stock = that.getAvailableQuantity(that.selectedProduct)
+						if (that.selectedProductQuantity > current_stock) {
+							that.fieldErrors.push('selectedProductQuantity')
+						}else{
+							that.fieldErrors.pop('selectedProductQuantity')
+						}
+					},
+
+					selectedProduct: function () {
+						const that = this
+						current_stock = that.getAvailableQuantity(that.selectedProduct)
+						if (that.selectedProductQuantity > current_stock) {
+							that.fieldErrors.push('selectedProductQuantity')
+						}else{
+							that.fieldErrors.pop('selectedProductQuantity')
+						}
+					}
+				},
 				methods: {
 					addToCart: function() {
 						console.log(this.cart)
 							if (!this.selectedProductQuantity) return;
+							if (!this.selectedProduct) return;
 							const data = {
 								productId: this.selectedProduct,
 								quantity: parseInt(this.selectedProductQuantity),
@@ -198,9 +222,17 @@
 						const matchProduct = this.products.find(p => p.id === this.selectedProduct);
 						return matchProduct && (matchProduct.price * quantity)  || 0;
 					},
-					getAvailableQuantity: function(batchId) {
-						const matchedBatch = this.batches.find(p => p.id === batchId);
-						return matchedBatch && (matchedBatch.available_quantity)  || 0;
+					getAvailableQuantity: function(selectedProduct) {
+						const matchedProduct = this.products.find(p => p.id === selectedProduct);
+						return matchedProduct && (matchedProduct.current_stock)  || 0;
+					},
+					checkProductAndQuentity: function(){
+						current_stock = that.getAvailableQuantity(that.selectedProduct)
+						if (that.selectedProductQuantity > current_stock) {
+							that.fieldErrors.push('selectedProductQuantity')
+						}else{
+							that.fieldErrors.pop('selectedProductQuantity')
+						}
 					},
 					getCartPayload: function() {
 						const data = {
@@ -212,6 +244,7 @@
 						return JSON.stringify(data);
 					},
 					submit: function() {
+
 						if (!this.customerEmail) this.fieldErrors.push('customerEmail');
 						if (!this.customerName) this.fieldErrors.push('customerName');
 						if (!this.customerPhone) this.fieldErrors.push('customerPhone');

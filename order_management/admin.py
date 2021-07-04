@@ -79,7 +79,7 @@ class OrderAdmin(admin.ModelAdmin):
 
         total_in_word = inflect.engine().number_to_words(total)
         customer_info = f'{settings.TLD}{order.qr_code.url}'
-        return get_pdf(template, content_disposition, data, total_in_word.title(), total, customer_info)
+        return get_pdf(template, content_disposition, data, str(total_in_word).title(), total, customer_info)
 
     generate_invoice.short_description = 'Generate invoice'
 
