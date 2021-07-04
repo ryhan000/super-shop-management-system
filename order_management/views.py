@@ -6,6 +6,7 @@ from django.contrib import messages
 from order_management.models import Customer, Order, Item
 import json
 
+
 # Create your views here.
 @csrf_exempt
 @login_required(login_url='/login/')

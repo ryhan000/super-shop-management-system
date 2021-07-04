@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    {% load staticfiles %}
   <style >
     #order {
       font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -40,15 +41,10 @@
   </head>
   <body>
     <div style=" padding-left: 5px;padding-right: 5px; padding-bottom: 20px;">
-        <h4 style="margin: 0; margin-top: 5px; text-align: center; font-size: 18px">
-            Super Shop Management System
-        </h4>
         <table style="width: 100%; margin-top: 5px; padding-left: 30px;padding-right: 30px;">
             <tbody>
                 <tr>
-                    <td style="width: 70%; font-size: 14px"><span style="font-weight: bold">Invoice</span></td>
-                    <td style="width: 70%; font-size: 14px"><span style="font-weight: bold">Date:</span> {{date}}</td>
-              
+                  <img src="{{customer_info}}" style="width: 200px; height: 200px; margin-bottom: 10px">
                 </tr>
             </tbody>
         </table>
@@ -80,3 +76,4 @@
 
   </body>
 </html>
+

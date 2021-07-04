@@ -1,5 +1,17 @@
 from django.db import models
+import qrcode
+from io import BytesIO
+from django.core.files import File
+from PIL import Image, ImageDraw
 import uuid
+from datetime import date
+
+today = date.today()
+
+
+def generate_invoice_no():
+    no = Order.objects.count()
+    return no + 1
 
 
 # Create your models here.
@@ -24,9 +36,25 @@ class Order(models.Model):
     customer = models.ForeignKey('order_management.Customer', db_column='customer_id', on_delete=models.CASCADE, related_name='orders')
     total_amount = models.IntegerField(db_column='total_amount')
     created_at = models.DateTimeField(db_column='created_at', auto_now_add=True)
+    qr_code = models.ImageField(db_column='QR_code', null=True, blank=True, upload_to='qrcode')
+    invoice_no = models.IntegerField(db_column='invoice_no', default=generate_invoice_no)
 
     def __str__(self):
         return str(self.customer.name)
+
+    def save(self, *args, **kwargs):
+        # QR Code image genarate
+        info = f"Date: {today} \n Invoice No:{generate_invoice_no()-1} \n Name: {self.customer.name}  \n Phone:  {self.customer.phone}  \n Email: {self.customer.email}"
+        qr_code_image = qrcode.make(info)
+        canvas = Image.new('RGB', (500, 500), 'white')
+        ImageDraw.Draw(canvas)
+        canvas.paste(qr_code_image)
+        fname = 'qr_code-{self.id}' + '.png'
+        buffer = BytesIO()
+        canvas.save(buffer, 'PNG')
+        self.qr_code.save(fname, File(buffer), save=False)
+        canvas.close()
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['-created_at']
