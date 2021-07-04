@@ -1,4 +1,4 @@
-#Super Shop Management System
+# Super Shop Management System
 
 This is a super-shop-management-system for ABC Shop.
 Allows the user to perform administrative tasks. It is comprised of:
