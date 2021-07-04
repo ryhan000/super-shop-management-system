@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <style >
+    #order {
+      font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    #order td, #order th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    #order tr:nth-child(even){background-color: #f2f2f2;}
+
+    #order tr:hover {background-color: #ddd;}
+
+    #order th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #525659;
+      color: white;
+    }
+    #order td {
+      font-size: 14px;
+    }
+
+    h4 {
+      text-align: center;
+    }
+
+  table{
+    font-size:1vw;
+  }
+
+  </style>
+  </head>
+  <body>
+    <div style=" padding-left: 5px;padding-right: 5px; padding-bottom: 20px;">
+        <h4 style="margin: 0; margin-top: 5px; text-align: center; font-size: 18px">
+            Super Shop Management System
+        </h4>
+        <table style="width: 100%; margin-top: 5px; padding-left: 30px;padding-right: 30px;">
+            <tbody>
+                <tr>
+                    <td style="width: 70%; font-size: 14px"><span style="font-weight: bold">Invoice</span></td>
+                    <td style="width: 70%; font-size: 14px"><span style="font-weight: bold">Date:</span> {{date}}</td>
+              
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <table id="order">
+      <th>SL. NO.</th>
+      <th>Item</th>
+      <th>Unit Price</th>
+      <th>QTY</th>
+      <th>Total</th>
+
+      {% for item in queryset %}
+        <tr>
+          <td>{{ item.index}}</td>
+          <td>{{ item.product_name}}</td>
+          <td>{{ item.unit_price}}</td>
+          <td>{{ item.quantity}}</td>
+          <td>{{ item.item_total}}</td>
+        </tr> 
+      {% endfor %}
+
+      <tr>
+          <td colspan="4">Amount in words: {{total_in_word}} taka only</td>
+          <td>{{total}}</td>
+        </tr> 
+
+    </table>
+
+  </body>
+</html>
