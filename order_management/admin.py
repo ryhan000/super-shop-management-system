@@ -10,7 +10,7 @@ from weasyprint import HTML
 import inflect
 
 
-def get_pdf(template, content_disposition, data, total_in_word, total, customer_info):
+def ganarate_pdf(template, content_disposition, data, total_in_word, total, customer_info):
 
     context = {
         'page_size': 'A4', 
@@ -31,9 +31,29 @@ def get_pdf(template, content_disposition, data, total_in_word, total, customer_
         return response
     return response
 
+def get_order_items(order):
+    data = []
+    index = 1
+    total_amount = 0
+
+    for item in order.items.all():
+        single_item = {}
+        item_total = item.quantity * item.product.unit_price
+        single_item['index'] = index
+        single_item['product_name'] = item.product.name
+        single_item['unit_price'] = item.product.unit_price
+        single_item['quantity'] = item.quantity
+        single_item['item_total'] = item_total
+        data.append(single_item)
+        total_amount += item_total
+        index += 1
+
+    return total_amount, data
+
 
 class CustomerAdmin(admin.ModelAdmin):
     list_display = ('name', 'phone', 'email')
+    list_filter = ('created_at', )
 
 admin.site.register(Customer, CustomerAdmin)
 
@@ -48,7 +68,9 @@ class ItemAdmin(admin.TabularInline):
 
 class OrderAdmin(admin.ModelAdmin):
     inlines = [ItemAdmin, ]
-    list_display = ('customer', 'total_amount')
+    list_display = ('customer', 'total_amount', 'created_at')
+    exclude = ['qr_code', ]
+    list_filter = ('created_at', )
     actions = ['generate_invoice']
 
     def generate_invoice(modeladmin, request, queryset):
@@ -60,26 +82,10 @@ class OrderAdmin(admin.ModelAdmin):
         order = queryset.first()
         template = "invoice.html"
         content_disposition = 'attachment; filename="Invoice.pdf"'
-
-        data = []
-        index = 1
-        total = 0
-
-        for item in order.items.all():
-            single_item = {}
-            item_total = item.quantity * item.product.unit_price
-            single_item['index'] = index
-            single_item['product_name'] = item.product.name
-            single_item['unit_price'] = item.product.unit_price
-            single_item['quantity'] = item.quantity
-            single_item['item_total'] = item_total
-            data.append(single_item)
-            total += item_total
-            index += 1
-
-        total_in_word = inflect.engine().number_to_words(total)
+        total_amount, order_items = get_order_items(order)
+        total_in_word = inflect.engine().number_to_words(total_amount)
         customer_info = f'{settings.TLD}{order.qr_code.url}'
-        return get_pdf(template, content_disposition, data, str(total_in_word).title(), total, customer_info)
+        return ganarate_pdf(template, content_disposition, order_items, total_in_word.title(), total_amount, customer_info)
 
     generate_invoice.short_description = 'Generate invoice'
 

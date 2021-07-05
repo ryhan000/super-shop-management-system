@@ -16,7 +16,7 @@ def new_order(request):
         order = Order.objects.create(customer=customer, total_amount=0)
         order.total_amount = create_order_item(data, order)
         order.save()  
-        messages.success(request, f'The new order  was added successfully.')
+        messages.success(request, f'The new order added successfully.')
         return redirect('/')
     else:
         context = get_product_list()
