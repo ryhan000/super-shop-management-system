@@ -43,7 +43,7 @@ class Order(models.Model):
         return str(self.customer.name)
 
     def save(self, *args, **kwargs):
-        # Ganarete QR Code image with customer information and save it.
+        # Ganarete QR Code image with customer and invoice information. After that save it.
         info = f"Date: {today} \n Invoice No:{generate_invoice_no()-1} \n Name: {self.customer.name}  \n Phone:  {self.customer.phone}  \n Email: {self.customer.email}"
         qr_code_image = qrcode.make(info)
         canvas = Image.new('RGB', (500, 500), 'white')

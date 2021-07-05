@@ -11,6 +11,32 @@ import inflect
 
 
 def ganarate_pdf(template, content_disposition, data, total_in_word, total, customer_info):
+    """Geneate invoice and download invoice as a PDF
+
+    Parameters
+    ----------
+    template : html page name
+        Like invoice.html
+
+    content_disposition : string
+        'attachment; filename="Invoice.pdf"'
+
+    data : list
+        This is the list of order item
+
+    total_in_word : string
+        Like fifty
+
+    total : int
+        Total order amount
+
+    customer_info : file
+        This is the QR code with customer and invoice information.
+
+    Returns
+    -------
+    HttpResponse
+    """
 
     context = {
         'page_size': 'A4', 
@@ -32,6 +58,23 @@ def ganarate_pdf(template, content_disposition, data, total_in_word, total, cust
     return response
 
 def get_order_items(order):
+    """Get order items list
+
+    Parameters
+    ----------
+    order : object
+        This is the order object
+
+    Returns
+    -------
+    total_amount: int
+        total order amount 
+
+    data: list
+        Order item list
+
+    """
+
     data = []
     index = 1
     total_amount = 0
@@ -74,6 +117,18 @@ class OrderAdmin(admin.ModelAdmin):
     actions = ['generate_invoice']
 
     def generate_invoice(modeladmin, request, queryset):
+        """Geneate invoice and download invoice as a PDF
+
+        Parameters
+        ----------
+        queryset : order list
+            This is the list of selected order
+
+        Returns
+        -------
+        HttpResponse
+
+        """
 
         if queryset.count() > 1:
             messages.warning(request, ' Please, select one order at a time for invoice generate.')
