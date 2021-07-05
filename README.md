@@ -15,6 +15,7 @@ Allows the user to perform administrative tasks. It is comprised of:
 3. Create a virtual environment in current directory to install dependencies and activate the virtual environment. You can activate the virtual environment by typing:  `source your_env/bin/activate `
 4. Run `chmod +x run.sh` to give the file `run.sh` execute permission than run `./run.sh` file. It will run the project. You will find this file in the project root directory.
 5. Application will run on port `8000` in your localhost server and navigate to`http://127.0.0.1:8000`.
+6. Login to this system by giving this creadentioan (username:admin,password:a123)
 
 
 ## TOC
